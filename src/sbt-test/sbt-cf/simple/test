@@ -1,4 +1,6 @@
-> sampleCommand
+# tests
 > cfPlugin:configuration
-> antlr4:configuration
-> inspect cfPluginVersion
+> show javacOptions
+> compile
+> runMain nullness.NullCF
+> last compile:runMain

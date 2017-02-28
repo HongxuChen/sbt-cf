@@ -3,32 +3,55 @@ package com.github.hongxuchen
 import sbt.Keys._
 import sbt._
 
-object ScopedCFPlugin extends Plugin {
+class JDKVersionUnsupported(msg: String) extends RuntimeException(msg)
 
-  private def doCommand(state: State): State = {
-    val log = state.log
-    val extracted: Extracted = Project.extract(state)
-    val structure = extracted.structure
-    val projectRefs = structure.allProjectRefs
-    state
-  }
+object CFPlugin extends Plugin {
 
-  lazy val cfPlugin = config("cfPlugin")
+  val currentCFVersion = "2.1.8"
 
   lazy val cfPluginVersion = SettingKey[String]("Version of CFPlugin")
 
-  val cFPluginSettings = Seq(
-    cfPluginVersion := "0.0.1"
-  ) ++
-  inConfig(cfPlugin)(Seq(
-  ))
+  lazy val cfJDKVersion = SettingKey[String]("Version of CF JDK")
 
-  override lazy val settings = Seq(
-    commands ++= Seq(sample)
+  lazy val useAnnotatedJDK = SettingKey[Boolean]("Whether or not use annotated JDK")
+
+  lazy val cfPlugin = config("cfPlugin")
+
+  val cFPluginSettings = Seq(
+  ) ++
+    inConfig(cfPlugin)(Seq())
+
+  def isCFJDKPath(path: String, cfVesion: String, jdkVersion: String): Boolean = {
+    val cfPathMatch = path.contains("org.checkerframework") || path.contains("org/checkerframework")
+    cfPathMatch && path.contains(cfVesion) && path.contains(jdkVersion)
+  }
+
+  def checkers: Seq[String] = Seq(
+    "org.checkerframework.checker.nullness.NullnessChecker"
   )
 
-  lazy val sample = Command.command("sampleCommand") { state =>
-    println("Hello SBT World!")
-    state
-  }
+  override lazy val settings = Seq(
+    cfPluginVersion := currentCFVersion,
+    useAnnotatedJDK := true,
+    javacOptions ++= (if (useAnnotatedJDK.value) {
+      for {
+        attrFile <- (managedClasspath in Runtime).value
+        path = attrFile.data.getAbsolutePath
+        if isCFJDKPath(path, cfPluginVersion.value, cfJDKVersion.value)
+      } yield "-Xbootclasspath/p:" + path
+    } else {
+      Seq.empty
+    }),
+    javacOptions ++= checkers.flatMap(c => Seq("-processor", c)),
+    cfJDKVersion := (sys.props("java.specification.version") match {
+      case "1.8" => "jdk8"
+      case "1.7" => "jdk7"
+      case s => throw new JDKVersionUnsupported(s"JDK version unsupported, found ${s}, required >= 1.7")
+    }),
+    libraryDependencies ++= Seq(
+      "org.checkerframework" % "checker-qual" % cfPluginVersion.value,
+      "org.checkerframework" % "checker" % cfPluginVersion.value,
+      "org.checkerframework" % "compiler" % cfPluginVersion.value,
+      "org.checkerframework" % cfJDKVersion.value % cfPluginVersion.value)
+  ) ++ cFPluginSettings
 }

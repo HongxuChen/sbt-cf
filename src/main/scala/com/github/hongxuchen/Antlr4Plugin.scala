@@ -76,7 +76,6 @@ object Antlr4Plugin extends Plugin {
     (sourceGenerators in Compile) += (antlr4Generate in Antlr4).taskValue,
     watchSources ++= (sourceDirectory.value ** "*.g4").get,
     cleanFiles += (javaSource in Antlr4).value,
-    libraryDependencies += (antlr4BuildDependency in Antlr4).value,
-    libraryDependencies += (antlr4RuntimeDependency in Antlr4).value
+    libraryDependencies ++= Seq((antlr4BuildDependency in Antlr4).value, (antlr4RuntimeDependency in Antlr4).value)
   )
 }
