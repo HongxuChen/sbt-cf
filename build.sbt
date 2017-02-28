@@ -2,9 +2,9 @@ sbtPlugin := true
 
 name := "sbt-cf"
 
-version := "0.0.1"
-
 organization := "com.github.hongxuchen"
+
+version := "0.0.1-SNAPSHOT"
 
 //scalaVersion := "2.11.8"
 
@@ -20,6 +20,14 @@ scalacOptions ++= Seq(
   "-Ywarn-dead-code"
 )
 
+val checkerFrameworkLibs = Seq(
+  "org.checkerframework" % "checker" % "2.1.8",
+  "org.checkerframework" % "compiler" % "2.1.8",
+  "org.checkerframework" % "jdk8" % "2.1.8"
+)
+
 libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.0.0" % "test"
 )
+
+libraryDependencies ++= checkerFrameworkLibs
