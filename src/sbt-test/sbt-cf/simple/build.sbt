@@ -5,6 +5,12 @@ scalaVersion := "2.11.8"
 crossPaths := false
 autoScalaLibrary := true
 
-cFPluginSettings
+cfPluginVersion := "2.1.7"
+cfUseAnnotatedJDK := true
+(cfJDKVersion in cfPlugin) := "jdk8"
+cfCheckers := Seq(
+  "Nullness",
+  "FmtStr"
+)
 
 antlr4Settings

@@ -6,11 +6,11 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class NullCF {
 
     private static void f(Object obj) {
-        System.out.println(obj.toString());
+        System.out.println("res: "+obj.toString());
     }
 
     public static void main(String[] args) {
-		/*@Nullable*/ Object obj = null;
+		@Nullable Object obj = "s";
         f(obj);
     }
 

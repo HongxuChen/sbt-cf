@@ -3,4 +3,3 @@
 > show javacOptions
 > compile
 > runMain nullness.NullCF
-> last compile:runMain
