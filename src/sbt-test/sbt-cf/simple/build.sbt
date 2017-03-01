@@ -12,5 +12,3 @@ cfCheckers := Seq(
   "Nullness",
   "FmtStr"
 )
-
-antlr4Settings
